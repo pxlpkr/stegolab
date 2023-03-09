@@ -111,9 +111,9 @@ public class PixelPlayground {
         return newPicture;
         }
     public static void main(String[] args) {
-        Picture beachPic = new Picture("KatieFancy.jpg");
+        Picture beachPic = new Picture("water.jpg");
         beachPic.explore();
-        Picture beachPicNoBlue = keepOnlyBlue(beachPic);
+        Picture beachPicNoBlue = fixUnderwater(beachPic);
         beachPicNoBlue.explore();
     }
 }
