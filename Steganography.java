@@ -5,12 +5,14 @@ public class Steganography
     public static void main(String[] args)
     {
         Picture beach = new Picture("beach.jpg");
+        Picture arch = new Picture("arch.jpg");
         beach.explore();
-        Picture copy = testSetLow(beach, new Color(155, 0, 255));
-        copy.explore();
-        Picture copy2 = revealPicture(copy);
-        copy2.setTitle("REVEALED");
-        copy2.explore();
+        arch.explore();
+        if (canHide(beach, arch)) {
+            Picture copy = revealPicture(hidePicture(beach, arch));
+            copy.setTitle("Secret feet picks");
+            copy.explore();
+        }
     }
 
     /**
@@ -74,12 +76,51 @@ public class Steganography
             for (int c = 0; c < pixels[0].length; c++)
             { 	
                 Color col = source[r][c].getColor();
-                pixels[r][c].setRed(col.getRed() % 4 * 64 + col.getRed() / 4);
-                pixels[r][c].setGreen(col.getGreen() % 4 * 64 + col.getGreen() / 4);
-                pixels[r][c].setBlue(col.getBlue() % 4 * 64 + col.getBlue() / 4);
+                pixels[r][c].setRed(col.getRed() % 4 * 64);
+                pixels[r][c].setGreen(col.getGreen() % 4 * 64);
+                pixels[r][c].setBlue(col.getBlue() % 4 * 64);
             }
         }
         return copy; 
     }
 
+    /** 
+    * Determines whether secret can be hidden in source, which is true if source and secret are the same dimensions. 
+    * @param source is not null 
+    * @param secret is not null 
+    * @return true if secret can be hidden in source, false otherwise. 
+    */
+    public static boolean canHide(Picture source, Picture secret){
+        return source.getHeight() >= secret.getHeight() && source.getWidth() >= secret.getWidth();
+    }
+
+    /** 
+    * Some Documentation
+    * @author Dylan Ward
+    */
+    public static Picture hidePicture(Picture source, Picture secret){
+        Picture sourcePic = new Picture(source);
+        Picture secretPic = new Picture(secret);
+        Pixel[][] sourcePixels = sourcePic.getPixels2D();
+        Pixel[][] secretPixels = secretPic.getPixels2D();
+        for (int r = 0; r < secretPixels.length; r++)
+        { 
+            for (int c = 0; c < secretPixels[0].length; c++)
+            { 	
+                int hiddenRed = secretPixels[r][c].getRed() / 64;
+                int hiddenGreen = secretPixels[r][c].getGreen() / 64;
+                int hiddenBlue = secretPixels[r][c].getBlue() / 64;
+
+                int currentRed = sourcePixels[r][c].getRed() / 4 * 4;
+                int currentGreen = sourcePixels[r][c].getGreen() / 4 * 4;
+                int currentBlue = sourcePixels[r][c].getBlue() / 4 * 4;
+
+                sourcePixels[r][c].setRed(currentRed + hiddenRed);
+                sourcePixels[r][c].setGreen(currentGreen + hiddenGreen);
+                sourcePixels[r][c].setBlue(currentBlue + hiddenBlue);
+            }
+        } 
+        return sourcePic;
+    }
 }
+
